@@ -1,4 +1,4 @@
-# Provision-Devices.ps1
+# Initialize-Devices.ps1
 # Automated device provisioning with Windows image deployment
 
 param(
@@ -17,7 +17,7 @@ param(
 
 <#
 .SYNOPSIS
-    Provisions devices with a Windows image
+    Initialize and provision devices with a Windows image
 
 .DESCRIPTION
     Reads device list from CSV, validates devices, and deploys Windows image
@@ -36,12 +36,12 @@ param(
     Path to log file
 
 .EXAMPLE
-    .\Provision-Devices.ps1 -DeviceList "C:\devices.csv" -ImagePath "C:\images\build.wim"
+    Initialize-Devices -DeviceList "C:\devices.csv" -ImagePath "C:\images\build.wim"
 #>
 
 # Source logging utility
 $scriptDir = Split-Path $MyInvocation.MyCommand.Path
-. "$scriptDir\Log-Message.ps1"
+. "$scriptDir\Write-LogMessage.ps1"
 
 function Test-DeviceAvailability {
     param([string]$DeviceIP)
@@ -54,7 +54,7 @@ function Test-DeviceAvailability {
     }
 }
 
-function Deploy-ImageToDevice {
+function Invoke-ImageDeployment {
     param(
         [string]$DeviceIP,
         [string]$DeviceName,
@@ -62,7 +62,7 @@ function Deploy-ImageToDevice {
         [int]$TimeoutSeconds
     )
     
-    Log-Message "Starting deployment to $DeviceName ($DeviceIP)" "Info" $LogFile
+    Write-LogMessage "Starting deployment to $DeviceName ($DeviceIP)" "Info" $LogFile
     
     try {
         # Validate image exists
@@ -73,7 +73,7 @@ function Deploy-ImageToDevice {
         # Wait for device to be available
         $waitTime = 0
         while (-not (Test-DeviceAvailability -DeviceIP $DeviceIP) -and $waitTime -lt 300) {
-            Log-Message "Waiting for device $DeviceName to become available..." "Warning" $LogFile
+            Write-LogMessage "Waiting for device $DeviceName to become available..." "Warning" $LogFile
             Start-Sleep -Seconds 10
             $waitTime += 10
         }
@@ -84,7 +84,7 @@ function Deploy-ImageToDevice {
         
         # Deploy image (this is a simplified example)
         # In production, you'd use Windows Deployment Services (WDS) or similar
-        Log-Message "Deploying image to $DeviceName..." "Info" $LogFile
+        Write-LogMessage "Deploying image to $DeviceName..." "Info" $LogFile
         
         # Create deployment job
         $deploymentParams = @{
@@ -106,18 +106,18 @@ function Deploy-ImageToDevice {
         $jobResult = Wait-Job -Job $job -Timeout $TimeoutSeconds
         
         if ($jobResult.State -eq "Completed") {
-            Log-Message "Image deployed successfully to $DeviceName" "Success" $LogFile
+            Write-LogMessage "Image deployed successfully to $DeviceName" "Success" $LogFile
             return $true
         } else {
             throw "Deployment job timed out or failed"
         }
     } catch {
-        Log-Message "Failed to deploy to $DeviceName : $_" "Error" $LogFile
+        Write-LogMessage "Failed to deploy to $DeviceName : $_" "Error" $LogFile
         return $false
     }
 }
 
-function Start-DeviceProvisioning {
+function Initialize-Devices {
     param(
         [string]$DeviceList,
         [string]$ImagePath,
@@ -125,9 +125,9 @@ function Start-DeviceProvisioning {
         [string]$LogFile
     )
     
-    Log-Message "Beginning device provisioning" "Info" $LogFile
-    Log-Message "Device List: $DeviceList" "Info" $LogFile
-    Log-Message "Image Path: $ImagePath" "Info" $LogFile
+    Write-LogMessage "Beginning device initialization" "Info" $LogFile
+    Write-LogMessage "Device List: $DeviceList" "Info" $LogFile
+    Write-LogMessage "Image Path: $ImagePath" "Info" $LogFile
     
     try {
         # Validate inputs
@@ -141,14 +141,14 @@ function Start-DeviceProvisioning {
         
         # Read device list
         $devices = Import-Csv -Path $DeviceList
-        Log-Message "Loaded $($devices.Count) devices from list" "Info" $LogFile
+        Write-LogMessage "Loaded $($devices.Count) devices from list" "Info" $LogFile
         
         # Provision each device
         $successCount = 0
         $failureCount = 0
         
         foreach ($device in $devices) {
-            $result = Deploy-ImageToDevice `
+            $result = Invoke-ImageDeployment `
                 -DeviceIP $device.IP `
                 -DeviceName $device.DeviceName `
                 -ImagePath $ImagePath `
@@ -162,7 +162,7 @@ function Start-DeviceProvisioning {
         }
         
         # Log summary
-        Log-Message "Provisioning complete: $successCount successful, $failureCount failed" "Info" $LogFile
+        Write-LogMessage "Device initialization complete: $successCount successful, $failureCount failed" "Info" $LogFile
         
         return @{
             Success = $successCount
@@ -171,11 +171,11 @@ function Start-DeviceProvisioning {
         }
         
     } catch {
-        Log-Message "Critical error during provisioning: $_" "Error" $LogFile
+        Write-LogMessage "Critical error during initialization: $_" "Error" $LogFile
         throw
     }
 }
 
 # Main execution
-Start-DeviceProvisioning -DeviceList $DeviceList -ImagePath $ImagePath `
+Initialize-Devices -DeviceList $DeviceList -ImagePath $ImagePath `
     -TimeoutSeconds $TimeoutSeconds -LogFile $LogFile

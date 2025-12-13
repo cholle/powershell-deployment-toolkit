@@ -1,5 +1,5 @@
-# Log-Message.ps1
-# Centralized logging utility for consistent logging across all scripts
+# Write-LogMessage.ps1
+# Write log messages with formatting and severity levels
 
 param(
     [Parameter(Mandatory=$true)]
@@ -15,11 +15,11 @@ param(
 
 <#
 .SYNOPSIS
-    Centralized logging function for infrastructure scripts
+    Write log messages with formatting and severity levels
 
 .DESCRIPTION
-    Logs messages to both console and file with timestamps and severity levels.
-    Creates log directory if it doesn't exist.
+    Writes messages to both console and file with timestamps and severity levels.
+    Creates log directory if it doesn't exist. Uses approved PowerShell verb 'Write-'.
 
 .PARAMETER Message
     The message to log
@@ -31,13 +31,13 @@ param(
     Path to log file. Defaults to C:\Logs\deployment.log
 
 .EXAMPLE
-    Log-Message "Device provisioning started" "Info"
-    Log-Message "Warning: Device offline" "Warning"
-    Log-Message "Provisioning failed" "Error"
-    Log-Message "All devices ready" "Success"
+    Write-LogMessage "Device initialization started" "Info"
+    Write-LogMessage "Warning: Device offline" "Warning"
+    Write-LogMessage "Initialization failed" "Error"
+    Write-LogMessage "All devices ready" "Success"
 #>
 
-function Log-Message {
+function Write-LogMessage {
     param(
         [string]$Message,
         [string]$Severity = "Info",
@@ -72,4 +72,4 @@ function Log-Message {
 }
 
 # Main execution
-Log-Message $Message $Severity $LogFile
+Write-LogMessage $Message $Severity $LogFile
