@@ -1,0 +1,25 @@
+# PowerShell
+*.ps1xml
+*.psd1~
+*.psm1~
+
+# Logs
+*.log
+*.log.*
+
+# Sensitive files
+*.credentials
+*.secret
+config.json
+devices.csv
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/

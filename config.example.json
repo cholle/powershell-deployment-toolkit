@@ -1,0 +1,40 @@
+{
+  "DeploymentConfig": {
+    "Environment": "Production",
+    "LogPath": "C:\\Logs\\deployment.log",
+    "ImagePath": "C:\\Images\\windows-build-22H2.wim",
+    "DeviceListPath": "C:\\Config\\devices.csv",
+    "DeploymentTimeoutSeconds": 3600,
+    "MaxRetries": 3,
+    "RetryDelaySeconds": 5
+  },
+  "ImageSettings": {
+    "BaseImage": "windows-22H2-base.wim",
+    "DriverPath": "C:\\Drivers",
+    "ImageMountPoint": "C:\\ImageMount",
+    "ApplyUpdates": true,
+    "InjectDrivers": true
+  },
+  "DeviceSettings": {
+    "ValidationTimeout": 300,
+    "WaitForAvailability": true,
+    "MaxParallelDeployments": 5
+  },
+  "Notifications": {
+    "EnableEmailNotifications": false,
+    "NotificationRecipients": ["admin@example.com"],
+    "NotifyOnSuccess": true,
+    "NotifyOnFailure": true
+  },
+  "Azure": {
+    "SubscriptionId": "your-subscription-id",
+    "ResourceGroup": "your-resource-group",
+    "StorageAccountName": "yourstorageaccount"
+  },
+  "AzureDevOps": {
+    "Organization": "your-org",
+    "Project": "your-project",
+    "BuildDefinitionId": 123,
+    "ArtifactDropPath": "\\\\server\\share\\drops"
+  }
+}
