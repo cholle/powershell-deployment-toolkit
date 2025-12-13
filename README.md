@@ -5,28 +5,28 @@ A collection of practical PowerShell scripts for Windows infrastructure automati
 ## Scripts Included
 
 ### Device & Deployment Management
-- `Provision-Devices.ps1` - Automated device provisioning and configuration
-- `Deploy-WindowsImage.ps1` - Deploy Windows images to target devices
+- `Initialize-Devices.ps1` - Automated device provisioning and configuration
+- `Invoke-WindowsImageDeployment.ps1` - Deploy Windows images to target devices
 - `Get-DeviceStatus.ps1` - Query device status and readiness
 
 ### Image Management
-- `Mount-WindowsImage.ps1` - Mount/unmount Windows image files (.wim)
-- `Inject-Drivers.ps1` - Inject device drivers into Windows images
-- `Validate-ImageIntegrity.ps1` - Validate image health and completeness
+- `Mount-WindowsImage.ps1` - Mount/dismount Windows image files (.wim)
+- `Add-ImageDriver.ps1` - Add device drivers to Windows images
+- `Test-ImageIntegrity.ps1` - Validate image health and completeness
 
 ### Infrastructure Automation
-- `Configure-ADUser.ps1` - Create and configure Active Directory users
-- `Manage-FileShares.ps1` - Create and manage network file shares
-- `Setup-TestLab.ps1` - Configure test lab infrastructure
+- `New-ADUserConfiguration.ps1` - Create and configure Active Directory users
+- `New-FileShare.ps1` - Create and manage network file shares
+- `Initialize-TestLabEnvironment.ps1` - Configure test lab infrastructure
 
 ### Validation & Testing
 - `Test-DeviceConnectivity.ps1` - Test network and RDP connectivity
-- `Validate-Drivers.ps1` - Validate driver packages before deployment
-- `Run-DeploymentTests.ps1` - Run post-deployment validation tests
+- `Test-Drivers.ps1` - Validate driver packages before deployment
+- `Invoke-DeploymentValidation.ps1` - Run post-deployment validation tests
 
 ### Utilities
-- `Log-Message.ps1` - Centralized logging utility
-- `Get-ScriptConfig.ps1` - Load configuration from JSON files
+- `Write-LogMessage.ps1` - Centralized logging utility
+- `Get-ScriptConfiguration.ps1` - Load configuration from JSON files
 - `Invoke-RetryLogic.ps1` - Retry with exponential backoff pattern
 
 ## Usage
@@ -34,26 +34,26 @@ A collection of practical PowerShell scripts for Windows infrastructure automati
 ### Basic Example
 ```powershell
 # Import the toolkit
-. ".\Scripts\Log-Message.ps1"
-. ".\Scripts\Provision-Devices.ps1"
+. ".\Scripts\Write-LogMessage.ps1"
+. ".\Scripts\Initialize-Devices.ps1"
 
-# Provision devices from CSV
-Provision-Devices -DeviceList ".\devices.csv" -ImagePath "C:\images\build.wim"
+# Initialize devices from CSV
+Initialize-Devices -DeviceList ".\devices.csv" -ImagePath "C:\images\build.wim"
 ```
 
 ### Advanced Example
 ```powershell
 # Configure environment
-$config = Get-ScriptConfig -ConfigFile ".\config.json"
+$config = Get-ScriptConfiguration -ConfigFile ".\config.json"
 
-# Provision with error handling
+# Initialize with error handling
 try {
     Invoke-RetryLogic -ScriptBlock {
-        Provision-Devices -DeviceList $config.DeviceList -ImagePath $config.ImagePath
+        Initialize-Devices -DeviceList $config.DeviceList -ImagePath $config.ImagePath
     } -MaxRetries 3
-    Log-Message "Device provisioning completed successfully" "Success"
+    Write-LogMessage "Device initialization completed successfully" "Success"
 } catch {
-    Log-Message "Device provisioning failed: $_" "Error"
+    Write-LogMessage "Device initialization failed: $_" "Error"
 }
 ```
 
